@@ -1,12 +1,45 @@
-import tkinter
+import tkinter as tk
+from tkinter import ttk
 import tkinter.filedialog
 import customtkinter
 from cryptography.fernet import Fernet,InvalidToken, InvalidSignature
 import base64
 import binascii
+import os
 
 WRAP_PIXEL_WIDTH = 400
 
+
+class ClipboardEntry(customtkinter.CTkEntry):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
+        self.bind_shortcuts()
+
+
+    def bind_shortcuts(self):
+        self.bind("<Control-a>", self.select_all)
+        self.bind("<Control-c>", lambda e: self.copy_text())
+        self.bind("<Control-v>", lambda e: self.paste_text())
+        self.bind("<Control-x>", lambda e: self.cut_text())
+
+    def copy_text(self):
+        if self.selection_present():
+            self.clipboard_clear()
+            text = self.get()[self.index("sel.first"):self.index("sel.last")]
+            self.clipboard_append(text)
+
+    def paste_text(self):
+        self.delete("sel.first", "sel.last")
+        self.insert("insert", self.clipboard_get())
+
+    def cut_text(self):
+        self.copy_text()
+        self.delete("sel.first", "sel.last")
+
+    def select_all(self, event=None):
+        self.select_range(0, 'end')
+        self.icursor('end')
+        return "break"
 
 def main():
     customtkinter.set_appearance_mode("System")
@@ -34,10 +67,29 @@ def main():
 def open_file_lock(root,button_frame,lock_frame):
     print("Lock")
     root.filename = tkinter.filedialog.askopenfilename(title="Select a file to lock")
+
     if len(root.filename) != 0:
-       button_frame.pack_forget()
-       lock_frame.pack(expand = True)
-       handle_file_lock_up(root,root.filename,button_frame,lock_frame)
+        file_size = os.path.getsize(root.filename)
+        max_size = 50*1024*1024
+
+        if file_size > max_size:
+            button_frame.pack_forget()
+            lock_frame.pack(expand = True)
+            file_to_large(root,button_frame,lock_frame)
+        else:
+           button_frame.pack_forget()
+           lock_frame.pack(expand = True)
+           handle_file_lock_up(root,root.filename,button_frame,lock_frame)
+
+
+def file_to_large(root,button_frame,lock_frame):
+    print("File to large")
+    file_label= customtkinter.CTkLabel(master=lock_frame, text=f"File is to large max is 50MB",font=customtkinter.CTkFont(size=15,weight="bold"),wraplength=WRAP_PIXEL_WIDTH,  
+    justify="center")
+    file_label.pack(pady=10,padx=10)
+
+    back_button = customtkinter.CTkButton(master=root, text="Go Back!", command=lambda:home_page(root,button_frame,lock_frame,back_button))
+    back_button.pack(pady=10,padx=10)
 
 def open_file_unlock(root,button_frame,unlock_frame):
     print("Unlock")
@@ -80,7 +132,7 @@ def handle_file_unlock(root,file,button_frame,unlock_frame):
     back_button = customtkinter.CTkButton(master=root, text="Go Back!", command=lambda:home_page(root,button_frame,unlock_frame,back_button))
     back_button.pack(pady=10,padx=10)
 
-    input = customtkinter.CTkEntry(master=unlock_frame,placeholder_text="Type in the key:")
+    input = ClipboardEntry(master=unlock_frame,placeholder_text="Type in the key:")
     input.pack(pady=10,padx=10)
     
     
