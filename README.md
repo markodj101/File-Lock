@@ -3,6 +3,7 @@
 A secure GUI application for file encryption/decryption using Fernet symmetric encryption.
 
 ![File Locker Demo](demo-screenshot.png) <!-- Add actual screenshot if available -->
+![image](https://github.com/user-attachments/assets/c1557c02-e019-47cd-98b5-34953f2ae7d9)
 
 ## Features
 
