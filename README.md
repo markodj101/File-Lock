@@ -20,14 +20,6 @@ A secure GUI application for file encryption/decryption using Fernet symmetric e
     - File size limits (15MB max for decryption)
   - Secure temporary file handling during operations
 
-- **User Interface**
-  - Modern dark/light theme (system dependent)
-  - Context-aware controls:
-    - Right-click context menu in text fields
-    - Keyboard shortcuts (CTRL+A/C/V/X)
-  - Responsive error feedback
-  - File size validation before processing
-
 ## Requirements
 
 - Python 3.7+
